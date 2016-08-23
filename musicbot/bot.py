@@ -1391,6 +1391,17 @@ class MusicBot(discord.Client):
         player.playlist.clear()
         return Response(':put_litter_in_its_place:', delete_after=20)
 
+    async def cmd_remove(self, player, author):
+        """
+        Usage:
+            {command_prefix}remove
+
+        Removes the playlist.
+        """
+        # player.playlist.clear()
+
+        return Response(':put_litter_in_its_place:', delete_after=20)
+
     async def cmd_skip(self, player, channel, author, message, permissions, voice_channel):
         """
         Usage:

@@ -31,6 +31,13 @@ class Playlist(EventEmitter):
     def clear(self):
         self.entries.clear()
 
+    """
+        Allows the removal of one song from the queue, so you don't have to wait for it to play.
+    """
+    def remove(self, user, entry_id):
+        if self.entries.meta.get('author') == user:
+            self.entries.remove(entry_id-1)
+
     async def add_entry(self, song_url, **meta):
         """
             Validates and adds a song_url to be played. This does not start the download of the song.
