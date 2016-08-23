@@ -1404,17 +1404,20 @@ class MusicBot(discord.Client):
 
         except ValueError:
             raise exceptions.CommandError('{} is not a valid number'.format(remove_position), expire_in=20)
-
+        item_to_be_removed = player.playlist()
         for i, item in enumerate(player.playlist, 1):
             if item.meta.get('channel', False) and item.meta.get('author', False):
                 if i == remove_position:
                     item_to_be_removed = item
-                    #removed_title = item_to_be_removed.title
-                    removed_title.__dict__.update(item_to_be_removed.__dict__)
+                    # removed_title = item_to_be_removed.title
+                    # removed_title.title.update(item_to_be_removed.title)
         if item_to_be_removed:
             player.playlist.remove(author, item_to_be_removed)
-            return Response(':put_litter_in_its_place: Removing entry %s - Title: %s' % (remove_position, removed_title.title)
-                            , delete_after=20)
+            return Response(':put_litter_in_its_place: Removing entry %s ' % remove_position, delete_after=20)
+
+            # Haivng some trouble copying the title attribute and keeping it in a new object.
+            # return Response(':put_litter_in_its_place: Removing entry %s - Title: %s' % (remove_position,
+            #                item_to_be_removed.title), delete_after=20)
         else:
             return Response('Song %s not found :weary:' % remove_position)
 

@@ -41,7 +41,7 @@ class Playlist(EventEmitter):
 
                 # print('author= %s entered= %s' % e.meta.get('author', None) user.Name))
                 if e.meta.get('author', None).display_name == user.display_name:
-                #e.duration for e in islice(self.entries, position - 1)]:
+                # e.duration for e in islice(self.entries, position - 1)]:
                     print("title= " + item_to_be_removed.title)
                     try:
                         self.entries.remove(item_to_be_removed)
@@ -49,8 +49,6 @@ class Playlist(EventEmitter):
                         raise exceptions.CommandError('{} is not a entry number'.format(item_to_be_removed), expire_in=20)
 
                     return
-                #self.entries.copy()
-
         else:
             print("User object is Null")
 
