@@ -1391,16 +1391,32 @@ class MusicBot(discord.Client):
         player.playlist.clear()
         return Response(':put_litter_in_its_place:', delete_after=20)
 
-    async def cmd_remove(self, player, author):
+    async def cmd_remove(self, player, author, item_to_be_removed, removed_title, remove_position=None):
         """
         Usage:
             {command_prefix}remove
 
-        Removes the playlist.
+        Removes a single entry from the queue by position(use {command_prefix}queue to find position).
         """
-        # player.playlist.clear()
 
-        return Response(':put_litter_in_its_place:', delete_after=20)
+        try:
+            remove_position = int(remove_position)
+
+        except ValueError:
+            raise exceptions.CommandError('{} is not a valid number'.format(remove_position), expire_in=20)
+
+        for i, item in enumerate(player.playlist, 1):
+            if item.meta.get('channel', False) and item.meta.get('author', False):
+                if i == remove_position:
+                    item_to_be_removed = item
+                    #removed_title = item_to_be_removed.title
+                    removed_title.__dict__.update(item_to_be_removed.__dict__)
+        if item_to_be_removed:
+            player.playlist.remove(author, item_to_be_removed)
+            return Response(':put_litter_in_its_place: Removing entry %s - Title: %s' % (remove_position, removed_title.title)
+                            , delete_after=20)
+        else:
+            return Response('Song %s not found :weary:' % remove_position)
 
     async def cmd_skip(self, player, channel, author, message, permissions, voice_channel):
         """

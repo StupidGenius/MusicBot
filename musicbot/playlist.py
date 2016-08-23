@@ -4,6 +4,7 @@ from collections import deque
 from itertools import islice
 from random import shuffle
 
+from . import exceptions
 from .utils import get_header
 from .entry import URLPlaylistEntry
 from .exceptions import ExtractionError, WrongEntryTypeError
@@ -34,9 +35,25 @@ class Playlist(EventEmitter):
     """
         Allows the removal of one song from the queue, so you don't have to wait for it to play.
     """
-    def remove(self, user, entry_id):
-        if self.entries.meta.get('author') == user:
-            self.entries.remove(entry_id-1)
+    def remove(self, user, item_to_be_removed):
+        if user:
+            for e in self.entries:
+
+                # print('author= %s entered= %s' % e.meta.get('author', None) user.Name))
+                if e.meta.get('author', None).display_name == user.display_name:
+                #e.duration for e in islice(self.entries, position - 1)]:
+                    print("title= " + item_to_be_removed.title)
+                    try:
+                        self.entries.remove(item_to_be_removed)
+                    except ValueError:
+                        raise exceptions.CommandError('{} is not a entry number'.format(item_to_be_removed), expire_in=20)
+
+                    return
+                #self.entries.copy()
+
+        else:
+            print("User object is Null")
+
 
     async def add_entry(self, song_url, **meta):
         """
