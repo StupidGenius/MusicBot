@@ -247,6 +247,24 @@ class Playlist(EventEmitter):
         if self.peek() is entry:
             entry.get_ready_future()
 
+    def remove_position(self, position):
+        rotDist = -1 * (position - 1)
+        self.entries.rotate(rotDist)
+        entry = self.entries.popleft()
+        self.emit('entry-removed', playlist=self, entry=entry)
+        self.entries.rotate(-1 * rotDist)
+        return entry
+
+    def remove_first(self):
+        entry = self.entries.popleft()
+        self.emit('entry-removed', playlist=self, entry=entry)
+        entryNext = None
+        entryNext = self.peek()
+
+        if entryNext:
+            entryNext.get_ready_future()
+        return entry
+
     async def get_next_entry(self, predownload_next=True):
         """
             A coroutine which will return the next song or None if no songs left to play.

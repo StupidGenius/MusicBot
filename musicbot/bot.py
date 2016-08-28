@@ -1391,35 +1391,43 @@ class MusicBot(discord.Client):
         player.playlist.clear()
         return Response(':put_litter_in_its_place:', delete_after=20)
 
-    async def cmd_remove(self, player, author, item_to_be_removed, removed_title, remove_position=None):
+    async def cmd_remove(self, player, position=None):
         """
         Usage:
             {command_prefix}remove
-
-        Removes a single entry from the queue by position(use {command_prefix}queue to find position).
+            {command_prefix}remove [song position]
+        Removes the next song from the queue.
+        If you specify a position, it removes the song at that position from the queue.
         """
 
-        try:
-            remove_position = int(remove_position)
+        if player.is_stopped:
+            raise exceptions.CommandError("Can't modify the queue! The player is not playing!", expire_in=20)
 
-        except ValueError:
-            raise exceptions.CommandError('{} is not a valid number'.format(remove_position), expire_in=20)
-        item_to_be_removed = player.playlist()
-        for i, item in enumerate(player.playlist, 1):
-            if item.meta.get('channel', False) and item.meta.get('author', False):
-                if i == remove_position:
-                    item_to_be_removed = item
-                    # removed_title = item_to_be_removed.title
-                    # removed_title.title.update(item_to_be_removed.title)
-        if item_to_be_removed:
-            player.playlist.remove(author, item_to_be_removed)
-            return Response(':put_litter_in_its_place: Removing entry %s ' % remove_position, delete_after=20)
+        length = len(player.playlist.entries)
 
-            # Haivng some trouble copying the title attribute and keeping it in a new object.
-            # return Response(':put_litter_in_its_place: Removing entry %s - Title: %s' % (remove_position,
-            #                item_to_be_removed.title), delete_after=20)
+        if length < 1:
+            raise exceptions.CommandError("Can't remove! Please add at least 1 song to the queue!", expire_in=20)
+
+        if not position:
+            entry = player.playlist.remove_first()
         else:
-            return Response('Song %s not found :weary:' % remove_position)
+            try:
+                position = int(position)
+            except ValueError:
+                raise exceptions.CommandError("This is not a valid song number! Please choose a song \
+                    number between 1 and %s!" % length, expire_in=20)
+
+            if position == 1:
+                entry = player.playlist.remove_first()
+            elif position < 1 or position > length:
+                raise exceptions.CommandError("Can't remove a song not in the queue! Please choose a song \
+                    number between 1 and %s!" % length, expire_in=20)
+            else:
+                entry = player.playlist.remove_position(position)
+
+        reply_text = ":x: Removed **%s** from the queue." % entry.title
+
+        return Response(reply_text, delete_after=30)
 
     async def cmd_skip(self, player, channel, author, message, permissions, voice_channel):
         """
